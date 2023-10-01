@@ -1,2 +1,11 @@
 Flask==2.3.3
 pydantic==2.4
+requests
+python-dotenv
+geopy
+pandas
+openpyxl
+scikit-learn
+matplotlib
+statsmodels
+keras

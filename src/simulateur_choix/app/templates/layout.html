@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+	{% block head %}
 	<meta charset="utf-8">
 	<title>Calculateur de Trajet</title>
 	<!-- Mobile Specific Metas -->
@@ -13,16 +14,14 @@
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery-ui.min.css') }}">
 	<!-- Main Style Css -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+	{% endblock %}
 </head>
 
 <body>
 	<div class="page-content">
-		<div class="wizard-heading">Calculateur de trajet</div>
-        <div class="wizard-v6-content">
-            {% block content %}
-            <!-- Le contenu spécifique de chaque page sera injecté ici -->
-            {% endblock %}
-        </div>
+		{% block content %}
+		<!-- Le contenu spécifique de chaque page sera injecté ici -->
+		{% endblock %}
     </div>
 
 

@@ -13,39 +13,43 @@
         width: auto; /* Assurez-vous qu'il n'y a pas de largeur fixe, afin que le tableau soit bien centré */
     }
 </style>
-<div class="wizard-form">
-    <div class="inner">
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th colspan="2">
-                            <div class="form-heading">
-                                <h3>Résultats pour {{ first_name }} {{ last_name }}</h3>
-                            </div>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="space-row">
-                        <th>Distance parcourue pendant une carrière:</th>
-                        <td>{{ total_distance }} km</td>
-                    </tr>
-                    <tr class="space-row">
-                        <th>Temps passé à conduire pendant une carrière:</th>
-                        <td>{{ total_time }} heures</td>
-                    </tr>
-                    <tr class="space-row">
-                        <th>Prix de l'essence pendant une carrière:</th>
-                        <td>{{ total_fuel_cost }} CHF</td>
-                    </tr>
-                    <tr class="space-row">
-                        <th>Émissions de CO2 pendant une carrière:</th>
-                        <td>{{ total_emissions }} kg</td>
-                    </tr>
-                </tbody>
-            </table>
+<div class="wizard-heading">Calculateur de trajet</div>
+<div class="wizard-v6-content">
+    <div class="wizard-form">
+        <div class="inner">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th colspan="2">
+                                <div class="form-heading">
+                                    <h3>Résultats pour {{ first_name }} {{ last_name }}</h3>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="space-row">
+                            <th>Distance parcourue pendant une carrière:</th>
+                            <td>{{ total_distance }} km</td>
+                        </tr>
+                        <tr class="space-row">
+                            <th>Temps passé à conduire pendant une carrière:</th>
+                            <td>{{ total_time }} heures</td>
+                        </tr>
+                        <tr class="space-row">
+                            <th>Prix de l'essence pendant une carrière:</th>
+                            <td>{{ total_fuel_cost }} CHF</td>
+                        </tr>
+                        <tr class="space-row">
+                            <th>Émissions de CO2 pendant une carrière:</th>
+                            <td>{{ total_emissions }} kg</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
+
 {% endblock %}

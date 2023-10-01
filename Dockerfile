@@ -2,7 +2,8 @@ FROM python:3.10
 
 COPY ./src ./src
 COPY setup.py .
-
+COPY .env .
+ENV DOTENV_PATH=/.env
 COPY requirements.txt requirements.txt
 
 RUN pip install -r requirements.txt

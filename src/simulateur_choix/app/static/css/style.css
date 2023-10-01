@@ -1,6 +1,25 @@
 body {
 	margin:  0;
 }
+#map, #map * {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    text-transform: inherit;
+    text-decoration: none;
+    color: inherit;
+    background: transparent;
+}
+#map {
+    width: 800px;
+    height: 600px;
+    position: center; /* Important pour le positionnement des enfants de la carte */
+}
 .page-content {
     min-height: 100vh;
 	width: 100%;
@@ -24,6 +43,15 @@ body {
 	-moz-flex-direction: column;
 	-webkit-flex-direction: column;
 }
+
+.alert h2 {
+	font-weight: 500;
+	font-size: 20px;
+	color: #fff;
+	margin: 0;
+    padding: 0 0 35px;
+}
+
 .wizard-heading {
     color: #fff;
     font-family: 'Open Sans', sans-serif;

@@ -1,140 +1,165 @@
 {% extends "layout.html" %}
-
+{% block head %}
+  {{ super() }}
+<link rel = "stylesheet" href = "http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
+{% endblock %}
 {% block content %}
-<!-- Affichage des messages d'erreur -->
-<!-- {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-{% endwith %} -->
-<div class="wizard-form">
-    <form class="form-register" id="form-register" action="/" method="post">
-        <div id="form-total">
-            <!-- SECTION 1 -->
-            <h2>
-                <p class="step-icon"><span>1</span></p>
-                <span class="step-text">Information Personnel</span>
-            </h2>
-            <section>
-                <div class="inner">
-                    <div class="form-heading">
-                        <h3>Information Personnel</h3>
-                        <span>1/2</span>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-holder">
-                            <label class="form-row-inner">
-                                <input type="text" class="form-control" id="first_name" name="first_name" required>
-                                <span class="label">Prénom</span>
-                            </label>
-                        </div>
-                        <div class="form-holder">
-                            <label class="form-row-inner">
-                                <input type="text" class="form-control" id="last_name" name="last_name" required>
-                                <span class="label">Nom</span>
-                            </label>
-                        </div>
-                </div>
-            </section>
-            <!-- SECTION 2: Transportation Info -->
-            <h2>
-                <p class="step-icon"><span>2</span></p>
-                <span class="step-text">Donnée de déplacement</span>
-            </h2>
-            <section>
-                <div class="inner">
-                    <div class="form-heading">
-                        <h3>Donnée de déplacement</h3>
-                        <span>2/2</span>
-                    </div>
-                    <!-- Point de départ -->
-                    <div class="form-row">
-                        <div class="form-holder form-holder-2">
-                            <label class="form-row-inner">
-                                <input type="text" class="form-control" id="start_point" name="start_point" required>
-                                <span class="label">Point de départ:</span>
-                            </label>
-                        </div>
-                    </div>
 
-                    <!-- Point d'arrivée -->
-                    <div class="form-row">
-                        <div class="form-holder form-holder-2">
-                            <label class="form-row-inner">
-                                <input type="text" class="form-control" id="end_point" name="end_point" required>
-                                <span class="label">Point d'arrivée:</span>
-                            </label>
+<script src = "http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+<div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="messageModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <!-- Affichage des messages d'erreur -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert">
+                            <h2>{{ message }}</h2>
                         </div>
-                    </div>
-
-                    <!-- Nombre de jour par semaine -->
-                    <div class="form-row">
-                        <div class="form-holder form-holder-2">
-                            <label class="form-row-inner">
-                                <input type="text" class="form-control" id="frequency" name="frequency" value="5" placeholder="Exemple: 5">
-                                <span class="label">Nombre de jour par semaine:</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Nombre de jour en covoiturage -->
-                    <div class="form-row">
-                        <div class="form-holder form-holder-2">
-                            <label class="form-row-inner">
-                                <input type="text" class="form-control" id="carpooling_days" name="carpooling_days" value="1" placeholder="Exemple: 1">
-                                <span class="label">Nombre de jour en covoiturage:</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Vitesse moyenne de la voiture sur le trajet -->
-                    <div class="form-row">
-                        <div class="form-holder form-holder-2">
-                            <label class="form-row-inner">
-                                <input type="text" class="form-control" id="average_speed" name="average_speed" value="50" placeholder="Exemple: 50">
-                                <span class="label">Vitesse moyenne de la voiture sur le trajet:</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Consommation l/100km -->
-                    <div class="form-row">
-                        <div class="form-holder form-holder-2">
-                            <label class="form-row-inner">
-                                <input type="text" class="form-control" id="fuel_consumption" name="fuel_consumption" value="6.5" placeholder="Exemple: 6.5">
-                                <span class="label">Consommation l/100km:</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Taux d'émission de la voiture kg/km -->
-                    <div class="form-row">
-                        <div class="form-holder form-holder-2">
-                            <label class="form-row-inner">
-                                <input type="text" class="form-control" id="emission_factor" name="emission_factor" value="0.0001" placeholder="Exemple: 0.0001">
-                                <span class="label">Taux d'émission de la voiture kg/km:</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Prix actuel de l'essence au litre -->
-                    <div class="form-row">
-                        <div class="form-holder form-holder-2">
-                            <label class="form-row-inner">
-                                <input type="text" class="form-control" id="fuel_price" name="fuel_price" value="1.96" placeholder="Exemple: 1.96">
-                                <span class="label">Prix actuel de l'essence au litre:</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
         </div>
-    </form>
+      </div>
+    </div>
+</div>
+<div class="wizard-heading">Calculateur de trajet</div>
+<div class="wizard-v6-content">
+    <div class="wizard-form">
+        <form class="form-register" id="form-register" action="/" method="post">
+            <div id="form-total">
+                <!-- SECTION 1 -->
+                <h2>
+                    <p class="step-icon"><span>1</span></p>
+                    <span class="step-text">Information Personnel</span>
+                </h2>
+                <section>
+                    <div class="inner">
+                        <div class="form-heading">
+                            <h3>Information Personnel</h3>
+                            <span>1/2</span>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-holder">
+                                <label class="form-row-inner">
+                                    <input type="text" class="form-control" id="first_name" name="first_name" required>
+                                    <span class="label">Prénom</span>
+                                </label>
+                            </div>
+                            <div class="form-holder">
+                                <label class="form-row-inner">
+                                    <input type="text" class="form-control" id="last_name" name="last_name" required>
+                                    <span class="label">Nom</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-holder">
+                                <label class="form-row-inner">
+                                    <input type="text" class="form-control" id="age" name="age" required>
+                                    <span class="label">Age</span>
+                                </label>
+                            </div>
+                            <div class="form-holder">
+                                <label class="form-row-inner">
+                                    <input type="text" class="form-control" id="retirement" name="retirement" required>
+                                    <span class="label">Age à la retraite</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- SECTION 2: map info -->
+                <h2>
+                    <p class="step-icon"><span>2</span></p>
+                    <span class="step-text">Map</span>
+                </h2>
+                <section>
+                    <div class="inner">
+                        <div id="map"></div>
+                        <input type="hidden" id="domicile_lat" name="domicile_lat">
+                        <input type="hidden" id="domicile_lng" name="domicile_lng">
+                        <input type="hidden" id="travail_lat" name="travail_lat">
+                        <input type="hidden" id="travail_lng" name="travail_lng">
+                    </div>
+                </section>
+                <h2>
+                    <p class="step-icon"><span>2</span></p>
+                    <span class="step-text">Kilomètrage</span>
+                </h2>
+                <section>
+                    <div class="inner">
+                        <div class="form-heading">
+                            <h3>Donnée de déplacement</h3>
+                            <span>2/2</span>
+                        </div>
+                        <!-- Nombre de jour par semaine -->
+                        <div class="form-row">
+                            <div class="form-holder form-holder-2">
+                                <label class="form-row-inner">
+                                    <input type="text" class="form-control" id="frequency" name="frequency" value="5" placeholder="Exemple: 5">
+                                    <span class="label">Nombre de jour par semaine:</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Nombre de jour en covoiturage -->
+                        <div class="form-row">
+                            <div class="form-holder form-holder-2">
+                                <label class="form-row-inner">
+                                    <input type="text" class="form-control" id="carpooling_days" name="carpooling_days" value="1" placeholder="Exemple: 1">
+                                    <span class="label">Nombre de jour en covoiturage:</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Vitesse moyenne sur le tracée -->
+                        <div class="form-row">
+                            <div class="form-holder form-holder-2">
+                                <label class="form-row-inner">
+                                    <input type="text" class="form-control" id="average_speed" name="average_speed" value="50" placeholder="Exemple: 6.5">
+                                    <span class="label">Vitesse moyenne sur le tracée:</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Consommation l/100km -->
+                        <div class="form-row">
+                            <div class="form-holder form-holder-2">
+                                <label class="form-row-inner">
+                                    <input type="text" class="form-control" id="fuel_consumption" name="fuel_consumption" value="6.18" placeholder="Exemple: 6.5">
+                                    <span class="label">Consommation l/100km:</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Taux d'émission de la voiture kg/km -->
+                        <div class="form-row">
+                            <div class="form-holder form-holder-2">
+                                <label class="form-row-inner">
+                                    <input type="text" class="form-control" id="emission_factor" name="emission_factor" value="0.1381" placeholder="Exemple: 0.0001">
+                                    <span class="label">Taux d'émission de la voiture kg/km:</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Prix actuel de l'essence au litre -->
+                        <div class="form-row">
+                            <div class="form-holder form-holder-2">
+                                <label class="form-row-inner">
+                                    <input type="text" class="form-control" id="fuel_price" name="fuel_price" value="1.96" placeholder="Exemple: 1.96">
+                                    <span class="label">Prix actuel de l'essence au litre:</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </form>
+    </div>
 </div>
 
 
 {% endblock %}
+

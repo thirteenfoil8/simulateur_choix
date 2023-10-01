@@ -1,6 +1,7 @@
 from pydantic import validate_call
 
 
+
 @validate_call
 def distance_total(distance_daily: float, frequency: float, carpooling_days: int = 0) -> float:
     """
@@ -32,15 +33,13 @@ def carpooling_reduction(distance_total: float, distance_daily :float, carpoolin
 
 
 @validate_call
-def time_spent(distance: float, average_speed: float) -> float:
-    """
-    Calculate total time spent traveling based on the given distance and average speed.
-
-    :param distance: Total distance traveled in km.
-    :param average_speed: Average speed of the vehicle in km/h.
-    :return: Total time spend in hour
-    """
-    return distance / average_speed
+def compute_total_time(daily_time_seconds: float, years:float):
+    DAYS_IN_YEAR = 365
+    total_time_seconds = daily_time_seconds * DAYS_IN_YEAR * years
+    days, remainder = divmod(total_time_seconds, 86400)
+    hours, remainder = divmod(remainder, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{days} jour, {hours} heures, {minutes} minutes, et {seconds} secondes"
 
 
 @validate_call
@@ -67,6 +66,17 @@ def compare_with_public_transport(fuel_total_cost: float, public_transport_cost:
     """
     #TODO Add average car cost per year with federal taxes, insurance, ...
     return fuel_total_cost - public_transport_cost
+
+@validate_call
+def time_spent(distance: float, average_speed: float) -> float:
+    """
+    Calculate total time spent traveling based on the given distance and average speed.
+
+    :param distance: Total distance traveled in km.
+    :param average_speed: Average speed of the vehicle in km/h.
+    :return: Total time spend in hour
+    """
+    return distance / average_speed
 
 @validate_call
 def co2_emissions(distance: float, emission_factor: float) -> float:
