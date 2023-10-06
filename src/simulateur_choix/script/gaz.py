@@ -3,23 +3,25 @@ from importlib.resources import path
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
-from statsmodels.tsa.arima.model import ARIMA
-from keras.models import Sequential
-from keras.layers import LSTM, Dense
+from sklearn.linear_model import Ridge
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_squared_error
-from sklearn.preprocessing import MinMaxScaler
-import pmdarima as pm
-import matplotlib.pyplot as plt
+from datetime import datetime
 import numpy as np
 
+
+
+
 class Gaz():
-    def __init__(self) -> None:
+    def __init__(self, verbose=False) -> None:
         with path('simulateur_choix.data', 'gaz.xlsx') as p:
             self.file_path = str(p)
         self.df = pd.DataFrame()
-        self.stable_model = LinearRegression()
-        self.medium_model = None
-        self.advanced_model = None
+        self.linear_model = LinearRegression()
+        self.medium_models = []
+        self.verbose= verbose
 
     def extract(self):
         self.df = pd.read_excel(self.file_path, usecols=["Monat / Mois", "Bleifrei 95 / sans plomb 95"], skiprows=4, engine='openpyxl')
@@ -43,37 +45,43 @@ class Gaz():
     def timestamp_to_int(self, ts):
         return (ts.year - 1993) * 12 + ts.month - 1
 
-    def train_stable_model(self):
+    def train_linear_model(self):
 
-        self.stable_model.fit(self.X_train, self.y_train)
-        y_pred = self.stable_model.predict(self.X_test)
+        self.linear_model.fit(self.X_train, self.y_train)
+        y_pred = self.linear_model.predict(self.X_test)
         mse = mean_squared_error(self.y_test, y_pred)
-        print(f'Mean Squared Error: {mse}')
+        if self.verbose:
+            print(f'Mean Squared Error: {mse}')
 
-    def train_medium_model(self):
-
+    def train_medium_model(self, alpha=0.01):
         # Définir les paramètres pour la recherche de grille
         parameters = {'degree': [2, 3, 4, 5, 6, 7, 8, 9, 10],
-                      'normalize': [True, False]
-                      }
+                    'normalize': [True, False]
+                    }
 
         # Transformer les données d'entraînement
         best_score = float('inf')
         best_degree = None
         best_model = None
 
+        # Standardize the data (important for Ridge regression)
+        scaler = StandardScaler()
+        X_train_scaled = scaler.fit_transform(self.X_train)
+        X_test_scaled = scaler.transform(self.X_test)
+
         for degree in parameters['degree']:
             poly = PolynomialFeatures(degree=degree)
-            X_poly_train = poly.fit_transform(self.X_train)
-            model = LinearRegression()
+            X_poly_train = poly.fit_transform(X_train_scaled)
+            model = Ridge(alpha=alpha)
 
             # Former le modèle avec les données transformées
             model.fit(X_poly_train, self.y_train)
 
             # Prédire les valeurs pour l'ensemble de test
-            X_poly_test = poly.transform(self.X_test)
+            X_poly_test = poly.transform(X_test_scaled)
             y_pred = model.predict(X_poly_test)
             mse = mean_squared_error(self.y_test, y_pred)
+            self.medium_models.append(model)
 
             # Vérifier si c'est le meilleur modèle
             if mse < best_score:
@@ -82,57 +90,86 @@ class Gaz():
                 best_model = model
 
         self.medium_model = best_model
+        self.best_degree = best_degree
+        self.scaler = scaler  # Store the scaler for later use in prediction
+        if self.verbose:
+            print(f'Mean Squared Error: {best_score}')
+            print(f'Best Polynomial Degree: {best_degree}')
 
-        print(f'Mean Squared Error: {best_score}')
-        print(f'Best Polynomial Degree: {best_degree}')
+    def grid_search_random_forest(self):
+        # Définir les hyperparamètres à tester
+        param_grid = {
+            'n_estimators': [200, 500, 1000],
+            'max_depth': [None, 10, 20, 30, 40],
+            'min_samples_split': [2, 5, 10],
+            'min_samples_leaf': [1, 2, 4]
+        }
 
+        rf = RandomForestRegressor(random_state=42)
+        grid_search = GridSearchCV(estimator=rf, param_grid=param_grid, 
+                                cv=3, n_jobs=-1, verbose=2, scoring='neg_mean_squared_error')
 
-    def train_advanced_model(self):
+        grid_search.fit(self.X_train, self.y_train.ravel())
+        self.rf_model = grid_search.best_estimator_
+        if self.verbose:
+            print(f"Best parameters found: {grid_search.best_params_}")
+        y_pred = self.rf_model.predict(self.X_test)
+        mse = mean_squared_error(self.y_test, y_pred)
+        if self.verbose:
+            print(f'Random Forest MSE with Best Parameters: {mse}')
 
-        # Train ARIMA
-        arima_model = ARIMA(self.y_train.ravel(), order=(0, 0, 0)).fit()
-        y_pred = arima_model.forecast(steps=len(self.y_test))
-        mse_arima = mean_squared_error(self.y_test.ravel(), y_pred)
-        print(f'Mean Squared Error: {mse_arima}')
+    def train_random_forest(self, n_estimators=100, max_depth=None):
+        self.rf_model = RandomForestRegressor(
+            n_estimators=500,
+            max_depth=None,
+            min_samples_split=2,
+            min_samples_leaf=1,
+            random_state=42
+        )
+        self.rf_model.fit(self.X_train, self.y_train.ravel())  # ravel() is used to convert y_train to 1D array
+        y_pred = self.rf_model.predict(self.X_test)
+        mse = mean_squared_error(self.y_test, y_pred)
+        if self.verbose:
+            print(f'Random Forest MSE: {mse}')
 
-        #LSTM
-        scaler = MinMaxScaler()
-        y_train_scaled = scaler.fit_transform(self.y_train)
-        y_test_scaled = scaler.transform(self.y_test)
+    def predict(self, dates, model_type="linear"):
+        # Convert single date to a list for consistency
+        if not isinstance(dates, list):
+            dates = [dates]
 
-        # Remodelage pour LSTM
-        X_train_lstm = y_train_scaled[:-1]
-        y_train_lstm = y_train_scaled[1:]
+        # Convert dates to integer format
+        dates_int = [self.timestamp_to_int(date) for date in dates]
+        dates_int = np.array(dates_int).reshape(-1, 1)
 
-        X_train_lstm = X_train_lstm.reshape((X_train_lstm.shape[0], 1, 1))
-
-        # Définition du modèle
-        lstm_model = Sequential()
-        lstm_model.add(LSTM(50, activation='relu', input_shape=(1, 1)))
-        lstm_model.add(Dense(1))
-        lstm_model.compile(optimizer='adam', loss='mse')
-
-        # Entrainement
-        lstm_model.fit(X_train_lstm, y_train_lstm, epochs=5000, verbose=0)
-
-        # Prédiction
-        y_pred_scaled = lstm_model.predict(self.X_test.reshape(self.X_test.shape[0], 1, 1))
-        y_pred = scaler.inverse_transform(y_pred_scaled)
-
-        mse_lstm = mean_squared_error(self.y_test, y_pred)
-        print(f'Mean Squared Error: {mse_lstm}')
-
-        if mse_arima < mse_lstm:
-            print("ARIMA selected as the advanced model")
-            self.advanced_model = arima_model
+        # Predict using the chosen model
+        if model_type == "linear":
+            return self.linear_model.predict(dates_int)
+        elif model_type == "medium":
+            poly = PolynomialFeatures(degree=self.best_degree)
+            dates_int_scaled = self.scaler.transform(dates_int)
+            dates_int_poly = poly.fit_transform(dates_int_scaled)
+            return self.medium_model.predict(dates_int_poly)
+        
+        elif model_type == "random_forest":
+            return self.rf_model.predict(dates_int)
         else:
-            print("LSTM selected as the advanced model")
-            self.advanced_model = lstm_model
+            raise ValueError("Invalid model_type. Choose either 'linear' or 'medium'.")
+
 
 if __name__ == "__main__":
     gaz = Gaz()
     gaz.extract().transform()
-    gaz.train_stable_model()
+    gaz.train_linear_model()
     gaz.train_medium_model()
-    gaz.train_advanced_model()
+    gaz.train_random_forest()
+
+    # Predicting using the linear model
+    date_to_predict = datetime(2025, 1, 1)
+    predicted_price_linear = gaz.predict(date_to_predict, model_type="linear")
+    print(f"Predicted price (linear model) for {date_to_predict}: {predicted_price_linear[0][0]}")
+
+    # Predicting using the random forest model
+    predicted_price_rf = gaz.predict(date_to_predict, model_type="random_forest")
+    print(f"Predicted price (random forest) for {date_to_predict}: {predicted_price_rf[0]}")
+
     print("end")
