@@ -7,9 +7,14 @@ from sklearn.linear_model import Ridge
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import GridSearchCV
+from prophet import Prophet
 from sklearn.metrics import mean_squared_error
+import matplotlib.pyplot as plt
 from datetime import datetime
 import numpy as np
+
+import os
+os.environ['CMDSTAN'] = "C:/Users/flori/anaconda3/envs/simulateur_choix/Lib/site-packages/cmdstanpy"
 
 
 
@@ -26,7 +31,7 @@ class Gaz():
     def extract(self):
         self.df = pd.read_excel(self.file_path, usecols=["Monat / Mois", "Bleifrei 95 / sans plomb 95"], skiprows=4, engine='openpyxl')
         return self
-    
+
     def transform(self):
         self.df.columns = ["month", "price"]
         self.df.dropna(inplace=True)
@@ -132,6 +137,12 @@ class Gaz():
         if self.verbose:
             print(f'Random Forest MSE: {mse}')
 
+    def train_prophet(self):
+        # Prophet requires the input dataframe to have specific column names
+        df_prophet = self.df[['month', 'price']].rename(columns={'month': 'ds', 'price': 'y'})
+        self.prophet_model = Prophet(yearly_seasonality=True, daily_seasonality=False, weekly_seasonality=False)
+        self.prophet_model.fit(df_prophet)
+
     def predict(self, dates, model_type="linear"):
         # Convert single date to a list for consistency
         if not isinstance(dates, list):
@@ -149,19 +160,25 @@ class Gaz():
             dates_int_scaled = self.scaler.transform(dates_int)
             dates_int_poly = poly.fit_transform(dates_int_scaled)
             return self.medium_model.predict(dates_int_poly)
-        
+
         elif model_type == "random_forest":
             return self.rf_model.predict(dates_int)
-        else:
-            raise ValueError("Invalid model_type. Choose either 'linear' or 'medium'.")
+
+        elif model_type == "profet":
+            future = pd.DataFrame(dates, columns=['ds'])
+            forecast = self.prophet_model.predict(future)
+            return forecast['yhat'].values
 
 
 if __name__ == "__main__":
-    gaz = Gaz()
+    gaz = Gaz(verbose=True)
     gaz.extract().transform()
     gaz.train_linear_model()
     gaz.train_medium_model()
     gaz.train_random_forest()
+
+    predicted_prices_linear = [gaz.predict(date, model_type="linear")[0][0] for date in gaz.df.month]
+    predicted_prices_rf = [gaz.predict(date, model_type="random_forest")[0] for date in gaz.df.month]
 
     # Predicting using the linear model
     date_to_predict = datetime(2025, 1, 1)
@@ -171,5 +188,27 @@ if __name__ == "__main__":
     # Predicting using the random forest model
     predicted_price_rf = gaz.predict(date_to_predict, model_type="random_forest")
     print(f"Predicted price (random forest) for {date_to_predict}: {predicted_price_rf[0]}")
+
+
+    # Generate a list of dates from 2023 to 2060
+    dates_2023_2060 = pd.date_range(start="2023-01-01", end="2060-01-01", freq='M')
+
+    # Predict prices for these dates using both models
+    predicted_prices_linear_2023_2060 = [gaz.predict(date, model_type="linear")[0][0] for date in dates_2023_2060]
+
+    # Plotting
+    plt.figure(figsize=(14, 7))
+    plt.plot(dates_2023_2060, predicted_prices_linear_2023_2060, label="Linear Model", color="blue")
+    plt.scatter(gaz.df.month, gaz.df.price, color="red", s=10, label="Actual Prices")
+    plt.title("Gas Price Predictions from 2023 to 2060")
+    plt.xlabel("Year")
+    plt.ylabel("Price")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+    print("end")
+
 
     print("end")
