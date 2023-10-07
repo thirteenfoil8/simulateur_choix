@@ -20,21 +20,61 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (currentIndex === 1) {
                     let dataContainer = document.getElementById('dataContainer');
                     let totalDistance = parseFloat(dataContainer.getAttribute('data-total-distance'));
+                    let earthWidth = 200;
+                    let shuttleWidth = 40;
+                    let containerWidth = document.getElementById('space-scene-id').offsetWidth;
 
-                    const earthCircumference = 40075;
-                    let numEarthRounds = Math.floor(totalDistance / earthCircumference); // calcule le nombre de tours de la Terre
+                    const distanceToMoon = 384400; // distance moyenne de la Terre à la Lune en km
+                    let numTripsToMoon = Math.floor(totalDistance / distanceToMoon); // calcule le nombre d'aller-retours Terre-Lune
 
-                    // Animer la rotation de la Terre avec D3.js
-                    d3.select("#earth")
-                        .transition()
-                        .duration(2000 * numEarthRounds) // chaque tour prend 2 secondes
-                        .ease(d3.easeLinear)
-                        .styleTween("transform", function() {
-                            return d3.interpolateString("rotate(0deg)", `rotate(${360 * numEarthRounds}deg)`);
+                    // Calcule la distance que la navette doit parcourir dans le conteneur pour se rendre à la Lune
+                    let tripDistancePx = (containerWidth - (earthWidth / 2) - shuttleWidth ); // Soustraire 250 pour prendre en compte la position initiale
+
+                    
+
+                    // Animer la navette se déplaçant vers la Lune et retour
+                    function animateShuttle() {
+                        let shuttle = d3.select("#shuttle");
+                    
+                        return new Promise((resolve) => {
+                            // Étape 1: Aller
+                            shuttle.transition()
+                                .duration(2000)
+                                .ease(d3.easeLinear)
+                                .style("transform", `translateX(${tripDistancePx}px) scaleX(-1)`)
+                                .on("end", () => {
+                                    // Étape 2: Changement de direction à la Lune
+                                    shuttle.transition()
+                                        .duration(1500)
+                                        .style("transform", `translateX(${250}px) scaleX(1)`)
+                                        .on("end", () => {
+                                            // Étape 3: Retour partiel
+                                            shuttle.transition()
+                                                .duration(2000)
+                                                .style("transform", `translateX(${-tripDistancePx}px) scaleX(1)`)
+                                                .on("end", () => {
+                                                    // Étape 4: Changement de direction près de la Terre
+                                                        shuttle.transition()
+                                                            .duration(1500)
+                                                            .style("transform", `translateX(-250px) scaleX(-1)`)
+                                                            .on("end", resolve);
+                                                });
+                                        });
+                                });
                         });
+                    }
+                    
+                    async function runAnimation() {
+                        for (let i = 0; i < numTripsToMoon; i++) {
+                            await animateShuttle();
+                        }
+                    }
+                    
+                    runAnimation();
+
 
                     // Mettez à jour le texte pour afficher combien de tours de la Terre la distance parcourue équivaut
-                    d3.select("#circumference-info").text(`Équivaut à ${numEarthRounds} tours de la Terre!`);
+                    d3.select("#circumference-info").text(`Équivaut à ${numTripsToMoon} voyages de la Terre à la Lune!`);
                     
 
                     // ##########    DALI ##############
