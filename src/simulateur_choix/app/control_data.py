@@ -1,8 +1,8 @@
 def validate_input_data(data: dict) -> str:
     # Vérification de la présence de toutes les clés nécessaires
     expected_keys = [
-        'domicile_lat', 'domicile_lng', 'travail_lat', 'travail_lng','first_name', 'last_name', 'age', 
-        'retirement', 'frequency', 'carpooling_days', 'fuel_consumption', 'emission_factor', 'fuel_price'
+        'domicile_lat', 'domicile_lng', 'travail_lat', 'travail_lng','first_name', 'last_name', 'age',
+        'retirement', 'frequency', 'carpooling_days', 'fuel_consumption', 'emission_factor', 
     ]
     for key in expected_keys:
         if key not in data:
@@ -50,13 +50,5 @@ def validate_input_data(data: dict) -> str:
     except ValueError:
         return "Veuillez entrer une consommation de carburant valide."
 
-    # Validation de emission_factor et fuel_price
-    for key in ['emission_factor', 'fuel_price']:
-        try:
-            val = float(data[key])
-            if val < 0 or val > 3:
-                raise ValueError
-        except ValueError:
-            return f"Veuillez entrer une valeur valide pour {key}."
 
     return None  # Tout est valide

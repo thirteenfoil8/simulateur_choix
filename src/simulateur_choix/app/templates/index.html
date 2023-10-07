@@ -2,6 +2,7 @@
 {% block head %}
   {{ super() }}
 <link rel = "stylesheet" href = "http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
+
 {% endblock %}
 {% block content %}
 
@@ -118,8 +119,8 @@
                         <div class="form-row">
                             <div class="form-holder form-holder-2">
                                 <label class="form-row-inner">
-                                    <input type="text" class="form-control" id="average_speed" name="average_speed" value="50" placeholder="Exemple: 6.5">
-                                    <span class="label">Vitesse moyenne sur le tracée:</span>
+                                    <input type="text" class="form-control" id="time_spent" name="time_spent" value="50">
+                                    <span class="label">temps de trajet (en minutes)</span>
                                 </label>
                             </div>
                         </div>
@@ -143,23 +144,13 @@
                                 </label>
                             </div>
                         </div>
-
-                        <!-- Prix actuel de l'essence au litre -->
-                        <div class="form-row">
-                            <div class="form-holder form-holder-2">
-                                <label class="form-row-inner">
-                                    <input type="text" class="form-control" id="fuel_price" name="fuel_price" value="1.96" placeholder="Exemple: 1.96">
-                                    <span class="label">Prix actuel de l'essence au litre:</span>
-                                </label>
-                            </div>
-                        </div>
                     </div>
                 </section>
             </div>
         </form>
     </div>
 </div>
-
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
 {% endblock %}
 

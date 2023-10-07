@@ -26,19 +26,18 @@ def index():
         carpooling_days = int(data.get('carpooling_days'))
         fuel_consumption = float(data.get('fuel_consumption'))
         emission_factor = float(data.get('emission_factor'))
-        fuel_price = float(data.get('fuel_price'))
-        average_speed = float(data.get('average_speed'))
+        time_spent = float(data.get('time_spent'))
 
         domicile_lat = float(data.get('domicile_lat'))
         domicile_lng = float(data.get('domicile_lng'))
         travail_lat = float(data.get('travail_lat'))
         travail_lng = float(data.get('travail_lng'))
-        distance_daily, time_daily = get_route(domicile_lat,domicile_lng, travail_lat, travail_lng, average_speed)
+        distance_daily, time_daily = get_route(domicile_lat,domicile_lng, travail_lat, travail_lng, time_spent)
         
         # compute metrics:
         remaning_working_years = (retirement-age) if (retirement-age) else 44
         total_distance = distance_total(distance_daily, frequency, carpooling_days)*remaning_working_years
-        total_fuel_cost = fuel_cost(total_distance, fuel_consumption, fuel_price)
+        total_fuel_cost = fuel_cost(total_distance, fuel_consumption, remaning_working_years)
         total_emissions = co2_emissions(total_distance, emission_factor)
         total_time = compute_total_time(time_daily, remaning_working_years)
 

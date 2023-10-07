@@ -1,4 +1,7 @@
 {% extends "layout.html" %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
 
 {% block content %}
 <style>
@@ -16,40 +19,107 @@
 <div class="wizard-heading">Calculateur de trajet</div>
 <div class="wizard-v6-content">
     <div class="wizard-form">
-        <div class="inner">
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th colspan="2">
+        <form class="form-register" id="form-register">
+            <div id="form-total">
+                <h2>
+                    <p class="step-icon"><span>1</span></p>
+                    <span class="step-text">Résultat</span>
+                </h2>
+                <section>
+                    <div class="inner">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th colspan="2">
+                                            <div class="form-heading">
+                                                <h3>Résultats pour {{ first_name }} {{ last_name }}</h3>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="space-row">
+                                        <th>Distance parcourue pendant une carrière:</th>
+                                        <td>{{ total_distance }} km</td>
+                                    </tr>
+                                    <tr class="space-row">
+                                        <th>Temps passé à conduire pendant une carrière:</th>
+                                        <td>{{ total_time }} heures</td>
+                                    </tr>
+                                    <tr class="space-row">
+                                        <th>Prix de l'essence pendant une carrière:</th>
+                                        <td>{{ total_fuel_cost }} CHF</td>
+                                    </tr>
+                                    <tr class="space-row">
+                                        <th>Émissions de CO2 pendant une carrière:</th>
+                                        <td>{{ total_emissions }} kg</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                <h2>
+                    <p class="step-icon"><span>2</span></p>
+                    <span class="step-text">Graphique</span>
+                </h2>
+                <section>
+                    <div class="inner">
+                        <div class="row">
+                            <div class="col-12">
                                 <div class="form-heading">
-                                    <h3>Résultats pour {{ first_name }} {{ last_name }}</h3>
+                                    <h3 id="circumference-info">Équivaut à {{ num_earth_rounds }} tours de la Terre!</h3>
                                 </div>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="space-row">
-                            <th>Distance parcourue pendant une carrière:</th>
-                            <td>{{ total_distance }} km</td>
-                        </tr>
-                        <tr class="space-row">
-                            <th>Temps passé à conduire pendant une carrière:</th>
-                            <td>{{ total_time }} heures</td>
-                        </tr>
-                        <tr class="space-row">
-                            <th>Prix de l'essence pendant une carrière:</th>
-                            <td>{{ total_fuel_cost }} CHF</td>
-                        </tr>
-                        <tr class="space-row">
-                            <th>Émissions de CO2 pendant une carrière:</th>
-                            <td>{{ total_emissions }} kg</td>
-                        </tr>
-                    </tbody>
-                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="earth-animation">
+                                    <div id="earth"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="inner">
+                        <div id="dali-mask-container">
+                            <!-- Les masques seront ajoutés ici via JavaScript -->
+                        </div>
+                        <div id="series-info"></div>
+                    </div>
+                    </div>
+                </section>  
             </div>
-        </div>
+        </form>
     </div>
 </div>
+<div id="dataContainer" 
+     data-total-distance="{{ total_distance }}"
+     data-total-time="{{ total_time }}"
+     data-total-fuel-cost="{{ total_fuel_cost }}"
+     data-total-emissions="{{ total_emissions }}">
+</div>
+<script src="{{ url_for('static', filename='js/result.js') }}"></script>
+<style>
+    #earth {
+        width: 100px;
+        height: 100px;
+        background: url("{{ url_for('static', filename='images/terre.png') }}") no-repeat center;
+        background-size: cover;
+        border-radius: 50%;
+    }
+    #dali-mask-container {
+    display: flex;
+    flex-wrap: wrap;
+    }
+
+    .dali-mask {
+        margin: 10px;
+        width: 10px;
+        height: 10px;
+        background-image: url("{{ url_for('static', filename='images/dali.png') }}");
+        background-size: cover;
+    }
+</style>
 
 {% endblock %}

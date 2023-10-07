@@ -7,7 +7,7 @@ from sklearn.linear_model import Ridge
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import GridSearchCV
-from prophet import Prophet
+import pickle
 from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 from datetime import datetime
@@ -42,6 +42,13 @@ class Gaz():
 
     def load(self):
         return self
+    
+    def get_model(self):
+        with path('simulateur_choix.data', 'linear_model.pkl') as p:
+            self.store_path = str(p)
+        with open(self.store_path, 'rb') as file:
+            self.linear_model = pickle.load(file)
+        return self.linear_model
 
     def get_train_test_set(self):
         X_train, X_test, y_train, y_test = train_test_split(self.df.month_int, self.df.price, test_size=0.2, random_state=42)
@@ -57,6 +64,11 @@ class Gaz():
         mse = mean_squared_error(self.y_test, y_pred)
         if self.verbose:
             print(f'Mean Squared Error: {mse}')
+
+        with path('simulateur_choix.data', 'linear_model.pkl') as p:
+            self.store_path = str(p)
+        with open(self.store_path, 'wb') as file:
+            pickle.dump(self.linear_model, file)
 
     def train_medium_model(self, alpha=0.01):
         # Définir les paramètres pour la recherche de grille
@@ -137,12 +149,6 @@ class Gaz():
         if self.verbose:
             print(f'Random Forest MSE: {mse}')
 
-    def train_prophet(self):
-        # Prophet requires the input dataframe to have specific column names
-        df_prophet = self.df[['month', 'price']].rename(columns={'month': 'ds', 'price': 'y'})
-        self.prophet_model = Prophet(yearly_seasonality=True, daily_seasonality=False, weekly_seasonality=False)
-        self.prophet_model.fit(df_prophet)
-
     def predict(self, dates, model_type="linear"):
         # Convert single date to a list for consistency
         if not isinstance(dates, list):
@@ -164,30 +170,17 @@ class Gaz():
         elif model_type == "random_forest":
             return self.rf_model.predict(dates_int)
 
-        elif model_type == "profet":
-            future = pd.DataFrame(dates, columns=['ds'])
-            forecast = self.prophet_model.predict(future)
-            return forecast['yhat'].values
-
-
 if __name__ == "__main__":
     gaz = Gaz(verbose=True)
     gaz.extract().transform()
-    gaz.train_linear_model()
-    gaz.train_medium_model()
-    gaz.train_random_forest()
+    gaz.get_model()
 
     predicted_prices_linear = [gaz.predict(date, model_type="linear")[0][0] for date in gaz.df.month]
-    predicted_prices_rf = [gaz.predict(date, model_type="random_forest")[0] for date in gaz.df.month]
 
     # Predicting using the linear model
     date_to_predict = datetime(2025, 1, 1)
     predicted_price_linear = gaz.predict(date_to_predict, model_type="linear")
     print(f"Predicted price (linear model) for {date_to_predict}: {predicted_price_linear[0][0]}")
-
-    # Predicting using the random forest model
-    predicted_price_rf = gaz.predict(date_to_predict, model_type="random_forest")
-    print(f"Predicted price (random forest) for {date_to_predict}: {predicted_price_rf[0]}")
 
 
     # Generate a list of dates from 2023 to 2060

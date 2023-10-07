@@ -1,5 +1,6 @@
 from pydantic import validate_call
-
+from datetime import datetime, timedelta
+from simulateur_choix.script.gaz import Gaz
 
 
 @validate_call
@@ -43,17 +44,28 @@ def compute_total_time(daily_time_seconds: float, years:float):
 
 
 @validate_call
-def fuel_cost(distance: float, fuel_consumption: float, fuel_price: float) -> float:
+def fuel_cost(distance: float, fuel_consumption: float, remaining_working_years: float) -> float:
     """
-    Calculate total fuel cost based on distance, fuel consumption, and fuel price.
+    Calculate total fuel cost based on distance, predicted fuel consumption, and fuel price.
 
     :param distance: Total distance traveled in km.
-    :param fuel_consumption: Fuel consumption (L/100km).
+    :param remaining_working_years: Number of years remaining in the user's career.
     :param fuel_price: Price of fuel per liter in CHF/L.
     :return: Total fuel cost in CHF.
-    """
+    """ 
+    gaz = Gaz()
+    model = gaz.get_model()
+
+    start_date = datetime.now()
+    end_date = datetime.now() + timedelta(days=365*remaining_working_years)
+    date_range = [start_date + timedelta(days=x) for x in range(0, (end_date-start_date).days)]
+    
+    # Assuming gaz.predict returns a list of predicted values
+    predicted_fuel_prices = gaz.predict(date_range, model_type="linear")
+    average_fuel_price = sum(predicted_fuel_prices) / len(predicted_fuel_prices)
+
     total_fuel = (distance / 100) * fuel_consumption
-    return total_fuel * fuel_price
+    return total_fuel * average_fuel_price[0]
 
 @validate_call
 def compare_with_public_transport(fuel_total_cost: float, public_transport_cost: float):
@@ -88,15 +100,3 @@ def co2_emissions(distance: float, emission_factor: float) -> float:
     :return: Total CO2 emissions.
     """
     return distance * emission_factor
-
-if __name__ == "__main__":
-    print(f"Distance parcouru pendant une carrière: {distance_total(48, 5)*48} km")
-
-    print(f"Distance parcouru pendant une carrière si on fait 2 jours de covoiturage: {distance_total(48, 5, carpooling_days=2)*48} km")
-
-    print(f"Temps passé à conduire pendant une carrière: {time_spent(distance_total(48, 5)*48, 50)} heures")
-
-    print(f"""Prix de l'essence pendant une carrière: {fuel_cost(
-                                                            distance=distance_total(48, 5)*48,
-                                                            fuel_consumption=6,
-                                                            fuel_price=2)} CHF """)

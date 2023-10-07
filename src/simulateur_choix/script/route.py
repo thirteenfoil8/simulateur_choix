@@ -9,7 +9,7 @@ config = dotenv_values(dotenv_path)
 
 @validate_call
 def get_route(domicile_lat: float, domicile_lng: float, travail_lat: float, 
-              travail_lng: float, average_speed: float):
+              travail_lng: float, time_spent: float):
 
     base_url = "https://maps.googleapis.com/maps/api/distancematrix/json"
     destination = f"{travail_lat}, {travail_lng}"
@@ -24,11 +24,11 @@ def get_route(domicile_lat: float, domicile_lng: float, travail_lat: float,
     response = requests.get(base_url, params=params)
     response = response.json()
     return compute_total_distance_and_time(response.get("rows"), domicile_lat , domicile_lng ,
-                                           travail_lat, travail_lng, average_speed)
+                                           travail_lat, travail_lng, time_spent)
 
 @validate_call
 def compute_total_distance_and_time(data: list, domicile_lat: float, domicile_lng: float,
-                                    travail_lat: float, travail_lng: float, average_speed: float):
+                                    travail_lat: float, travail_lng: float, time_spent: float):
     total_distance = 0  # en mètres
     total_time = 0      # en secondes
     distance_daily = None
@@ -48,5 +48,5 @@ def compute_total_distance_and_time(data: list, domicile_lat: float, domicile_ln
     except:
         distance_daily = geodesic((domicile_lat,domicile_lng), (travail_lat,travail_lng)).kilometers
         distance_daily *= 2
-        time_daily = distance_daily/average_speed*64*60
+        time_daily = time_spent*2
         return distance_daily, time_daily
