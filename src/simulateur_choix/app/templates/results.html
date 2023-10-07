@@ -66,29 +66,27 @@
                 </h2>
                 <section>
                     <div class="inner">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="form-heading">
-                                    <h3 id="circumference-info">Équivaut à {{ num_earth_rounds }} tours de la Terre!</h3>
-                                </div>
-                            </div>
+                        <div class="form-heading">
+                            <h3 id="circumference-info">Équivaut à {{ num_earth_rounds }} tours de la Terre!</h3>
                         </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="earth-animation">
-                                    <div id="earth"></div>
-                                </div>
-                            </div>
+                    </div>
+                    <div class="inner">
+                        <div class="earth-animation">
+                            <div id="earth"></div>
+                        </div>
+                    </div>
+
+                    <div class="inner">
+                        <div class="form-heading">
+                            <h3 id="series-info">Équivaut à {{numEarthRounds}} tours de la Terre!</h3>
                         </div>
                     </div>
                     <div class="inner">
                         <div id="dali-mask-container">
                             <!-- Les masques seront ajoutés ici via JavaScript -->
                         </div>
-                        <div id="series-info"></div>
                     </div>
-                    </div>
-                </section>  
+                </section>
             </div>
         </form>
     </div>
@@ -115,8 +113,8 @@
 
     .dali-mask {
         margin: 10px;
-        width: 10px;
-        height: 10px;
+        width: 20px;
+        height: 30px;
         background-image: url("{{ url_for('static', filename='images/dali.png') }}");
         background-size: cover;
     }
