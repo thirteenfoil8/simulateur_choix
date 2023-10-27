@@ -23,11 +23,12 @@ def get_route(domicile_lat: float, domicile_lng: float, travail_lat: float,
 
     response = requests.get(base_url, params=params)
     response = response.json()
-    return compute_total_distance_and_time(response.get("rows"), domicile_lat , domicile_lng ,
+
+    return compute_total_distance_and_time(response, domicile_lat , domicile_lng ,
                                            travail_lat, travail_lng, time_spent)
 
 @validate_call
-def compute_total_distance_and_time(data: list, domicile_lat: float, domicile_lng: float,
+def compute_total_distance_and_time(response: dict, domicile_lat: float, domicile_lng: float,
                                     travail_lat: float, travail_lng: float, time_spent: float):
     total_distance = 0  # en mètres
     total_time = 0      # en secondes
@@ -35,7 +36,8 @@ def compute_total_distance_and_time(data: list, domicile_lat: float, domicile_ln
     time_daily = None
 
     # Vérifiez si les données sont valides
-    try:
+    if response.get("status") == "OK":
+        data = response.get("rows")
         for element in data[0]["elements"]:
             total_distance += element["distance"]["value"]
             total_time += element["duration"]["value"]
@@ -45,7 +47,7 @@ def compute_total_distance_and_time(data: list, domicile_lat: float, domicile_ln
         time_daily *= 2
 
         return distance_daily, time_daily
-    except:
+    else:
         distance_daily = geodesic((domicile_lat,domicile_lng), (travail_lat,travail_lng)).kilometers
         distance_daily *= 2
         time_daily = time_spent*2

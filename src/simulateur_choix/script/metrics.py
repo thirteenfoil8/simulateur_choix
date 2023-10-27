@@ -67,6 +67,19 @@ def fuel_cost(distance: float, fuel_consumption: float, remaining_working_years:
     total_fuel = (distance / 100) * fuel_consumption
     return total_fuel * average_fuel_price[0]
 
+
+@validate_call
+def car_cost_annual(remaining_working_years: float) -> float:
+    """
+    Calculate total car cost based years. based on 
+    https://www.baloise.ch/fr/clients-prives/blog/auto/combien-coute-une-voiture-par-an.html#anchor-id-af15
+
+    :param remaining_working_years: Number of years remaining in the user's career.
+    :return: Total fuel cost in CHF.
+    """ 
+    car_cost_without_fuel = 8000
+    return car_cost_without_fuel * remaining_working_years
+
 @validate_call
 def compare_with_public_transport(fuel_total_cost: float, public_transport_cost: float):
     """

@@ -48,13 +48,13 @@
                                         <td>{{ total_time }} heures</td>
                                     </tr>
                                     <tr class="space-row">
-                                        <th>Prix de l'essence pendant une carrière:</th>
-                                        <td>{{ total_fuel_cost }} CHF</td>
+                                        <th>Prix de la voiture pendant une carrière:</th>
+                                        <td>{{ '{:,.0f}'.format(total_cost).replace(',', "'") }} CHF</td>
                                     </tr>
                                     <tr class="space-row">
                                         <th>Émissions de CO2 pendant une carrière:</th>
-                                        <td>{{ total_emissions }} kg</td>
-                                    </tr>
+                                        <td>{{ '{:,.0f}'.format(total_emissions).replace(',', "'") }} kg</td>
+                                    </tr>                                    
                                 </tbody>
                             </table>
                         </div>
@@ -71,7 +71,7 @@
                         </div>
                     </div>
                     <div class="inner">
-                        <div class="space-scene" id="space-scene-id" style="display: none;">
+                        <div class="space-scene" id="space-scene-id">
                             <div id="earth"></div>
                             <div id="shuttle"></div>
                             <div id="moon"></div>
@@ -90,7 +90,7 @@
                         </div>
                     </div>
                     <div class="inner">
-                        <div id="dali-mask-container">
+                        <div id="language-container">
                             <!-- Les masques seront ajoutés ici via JavaScript -->
                         </div>
                     </div>
@@ -102,7 +102,7 @@
 <div id="dataContainer" 
      data-total-distance="{{ total_distance }}"
      data-total-time="{{ total_time }}"
-     data-total-fuel-cost="{{ total_fuel_cost }}"
+     data-total-cost="{{ total_cost }}"
      data-total-emissions="{{ total_emissions }}">
 </div>
 <script src="{{ url_for('static', filename='js/result.js') }}"></script>
@@ -145,15 +145,15 @@
         transform: translateX(-250px) scaleX(-1);
         transition: transform 2s linear;
     }
-    #dali-mask-container {
+    #language-container {
     display: flex;
     flex-wrap: wrap;
     }
 
-    .dali-mask {
+    .language_mask {
         margin: 10px;
-        width: 20px;
-        height: 30px;
+        width: 100px;
+        height: 100px;
         background-image: url("{{ url_for('static', filename='images/dali.png') }}");
         background-size: cover;
     }
@@ -182,10 +182,6 @@
         transform: translateX(-2500px) scaleX(1);
         transition: transform 2s linear;
     }
-    body {
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-}
 </style>
 
 {% endblock %}
