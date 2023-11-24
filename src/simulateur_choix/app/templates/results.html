@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block head %}
   {{ super() }}
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -41,7 +42,7 @@
                                 <tbody>
                                     <tr class="space-row">
                                         <th>Distance parcourue pendant une carrière:</th>
-                                        <td>{{ total_distance }} km</td>
+                                        <td>{{ '{:,.0f}'.format(total_distance).replace(',', "'") }} km</td>
                                     </tr>
                                     <tr class="space-row">
                                         <th>Temps passé à conduire pendant une carrière:</th>
@@ -67,7 +68,8 @@
                 <section>
                     <div class="inner">
                         <div class="form-heading">
-                            <h3 id="circumference-info">Équivaut à {{ num_earth_rounds }} tours de la Terre!</h3>
+                            <img src="{{ url_for('static', filename='images/distance.png') }}"/>   
+                            <h3 id="circumference-info"></h3>
                         </div>
                     </div>
                     <div class="inner">
@@ -77,21 +79,32 @@
                             <div id="moon"></div>
                         </div>
                     </div>
-                    <div class="inner" id="map-container" style="display: none;">
-                        <div class="space-scene" id="map-scene-id">
-                            <div id="planisphere"></div>
-                            <div id="plane"></div>
+
+                    <div class="inner">
+                        <div class="form-heading">
+                            <img src="{{ url_for('static', filename='images/time.png') }}"/>  
+                            <h3 id="series-info"></h3>
+                        </div>
+                    </div>
+                    <div class="inner">
+                        <div id="language-container">
                         </div>
                     </div>
 
                     <div class="inner">
                         <div class="form-heading">
-                            <h3 id="series-info">Équivaut à {{numEarthRounds}} tours de la Terre!</h3>
+                            <img src="{{ url_for('static', filename='images/price.png') }}"/>  
+                            <h3 id="price-info"></h3>
                         </div>
                     </div>
                     <div class="inner">
-                        <div id="language-container">
-                            <!-- Les masques seront ajoutés ici via JavaScript -->
+                        <div id="price-container">
+                        </div>
+                    </div>
+                    <div class="inner">
+                        <div class="form-heading">
+                            <img src="{{ url_for('static', filename='images/pollution.png') }}"/>  
+                            <h3 id="CO2-info"></h3>
                         </div>
                     </div>
                 </section>
@@ -182,6 +195,23 @@
         transform: translateX(-2500px) scaleX(1);
         transition: transform 2s linear;
     }
+    .form-heading {
+        display: flex;
+        align-items: center; /* This will vertically align the icon and text in the center */
+        justify-content: flex-start; /* This will align the items to the start of the container */
+    }
+
+    .form-heading img {
+        height: 75px; /* Or your desired size */
+        width: auto;
+        margin-right: 10px; /* Adjust space between icon and text */
+        margin-bottom: 30px;
+    }
+
+    .form-heading h3 {
+        margin: 0; /* Removes default margin from h3 to align correctly */
+    }
+
 </style>
 
 {% endblock %}

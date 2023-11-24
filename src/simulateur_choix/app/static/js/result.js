@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     d3.select("#circumference-info").text(`Équivaut à ${numTripsToMoon} voyages de la Terre à la Lune!`);
                     
 
-                    // ########## Language ##############
+                // ########## Language ##############
                 let totalTimeDays = parseFloat(dataContainer.getAttribute('data-total-time')); // Supposons que le temps est en jours
 
 
@@ -106,6 +106,64 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 // Mettez à jour le texte pour indiquer combien de fois la série entière pourrait être visionnée
                 d3.select("#series-info").text(`Équivaut à apprendre ${numberOfTimesSeriesWatched} langues au niveau C1!`);
+                // ########## Price ##############
+                let totalPrice = parseFloat(dataContainer.getAttribute('data-total-cost'));
+                const priceOfAHouse = 1000000; // prix d'une maison en suisse
+                let numberOfHouses = Math.floor(totalPrice/ priceOfAHouse);
+                // pie chart that we can play with ( destroy it for example)
+                let pieChart = echarts.init(document.getElementById('price-container'));
+                // specify chart configuration item and data
+                let option = {
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{a} <br/>{b}: {c} CHF ({d}%)'
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 10,
+                        data: ['Maison', 'Reste']
+                    },
+                    series: [
+                        {
+                            name: 'Prix',
+                            type: 'pie',
+                            radius: ['50%', '70%'],
+                            avoidLabelOverlap: false,
+                            label: {
+                                show: false,
+                                position: 'center'
+                            },
+                            emphasis: {
+                                label: {
+                                    show: true,
+                                    fontSize: '14',
+                                    fontWeight: 'bold'
+                                }
+                            },
+                            labelLine: {
+                                show: false
+                            },
+                            data: [
+                                {value: numberOfHouses, name: 'Maison'},
+                                {value: 1, name: 'Reste'}
+                            ]
+                        }
+                    ]
+                };
+                // use configuration item and data specified to show chart
+                pieChart.setOption(option);
+                // Mettez à jour le texte pour indiquer combien de fois la série entière pourrait être visionnée
+                d3.select("#price-info").text(`Équivaut à ${numberOfHouses} maisons en Suisse!`);
+                // ########## CO2 ##############
+                let totalCO2 = parseFloat(dataContainer.getAttribute('data-total-emissions'));
+                const CO2PerFlight = 2100; // kg de CO2 par vol
+                let numberOfFlights = Math.floor(totalCO2/ CO2PerFlight);
+                // Calculez combien de fois la série entière pourrait être visionnée
+                const CO2PerYearPerPerson = 4360; // kg de CO2 par année par personne
+                let numberOfYears = Math.floor(totalCO2/ CO2PerYearPerPerson);
+                // Mettez à jour le texte pour indiquer combien de fois la série entière pourrait être visionnée
+                d3.select("#CO2-info").text(`Équivaut à ${numberOfFlights} vols Paris-New York!`);
+                // ########## CO2 ##############
                 }
             },
             onFinished: function (event, currentIndex) {
