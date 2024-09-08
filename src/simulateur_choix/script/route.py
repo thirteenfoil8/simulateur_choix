@@ -37,6 +37,7 @@ def compute_total_distance_and_time(response: dict, domicile_lat: float, domicil
 
     # Vérifiez si les données sont valides
     if response.get("status") == "OK":
+        print("using API")
         data = response.get("rows")
         for element in data[0]["elements"]:
             total_distance += element["distance"]["value"]
@@ -48,6 +49,7 @@ def compute_total_distance_and_time(response: dict, domicile_lat: float, domicil
 
         return distance_daily, time_daily
     else:
+        print("using geopy")
         distance_daily = geodesic((domicile_lat,domicile_lng), (travail_lat,travail_lng)).kilometers
         distance_daily *= 2
         time_daily = time_spent*2

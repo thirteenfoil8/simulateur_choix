@@ -3,12 +3,15 @@ from simulateur_choix.script.metrics import distance_total, compute_total_time, 
 from simulateur_choix.app.control_data import validate_input_data
 from simulateur_choix.script.route import get_route
 from math import floor
+from dotenv import dotenv_values
+import os
 
-
+dotenv_path = os.getenv("DOTENV_PATH", ".env")
+config = dotenv_values(dotenv_path)
 
 
 app = Flask(__name__)
-app.secret_key = 'une_cle_secrete_tres_difficile_a_deviner'
+app.secret_key = config["SECRET_KEY"]
 
 
 @app.route('/', methods=["GET", "POST"])

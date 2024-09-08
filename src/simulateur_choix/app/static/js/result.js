@@ -106,10 +106,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 // Mettez à jour le texte pour indiquer combien de fois la série entière pourrait être visionnée
                 d3.select("#series-info").text(`Équivaut à apprendre ${numberOfTimesSeriesWatched} langues au niveau C1!`);
+
                 // ########## Price ##############
                 let totalPrice = parseFloat(dataContainer.getAttribute('data-total-cost'));
-                const priceOfAHouse = 1000000; // prix d'une maison en suisse
-                let numberOfHouses = Math.floor(totalPrice/ priceOfAHouse);
+                const priceOfAsupercar = 200000; // prix d'une maison en suisse
+                let numberOfsupercars = Math.floor(totalPrice/ priceOfAsupercar);
                 // pie chart that we can play with ( destroy it for example)
                 let pieChart = echarts.init(document.getElementById('price-container'));
                 // specify chart configuration item and data
@@ -144,7 +145,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                 show: false
                             },
                             data: [
-                                {value: numberOfHouses, name: 'Maison'},
+                                {value: numberOfsupercars, name: 'Maison'},
                                 {value: 1, name: 'Reste'}
                             ]
                         }
@@ -153,7 +154,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 // use configuration item and data specified to show chart
                 pieChart.setOption(option);
                 // Mettez à jour le texte pour indiquer combien de fois la série entière pourrait être visionnée
-                d3.select("#price-info").text(`Équivaut à ${numberOfHouses} maisons en Suisse!`);
+                d3.select("#price-info").text(`Équivaut à ${numberOfsupercars} Porsche 911 Turbo S!`);
+                
                 // ########## CO2 ##############
                 let totalCO2 = parseFloat(dataContainer.getAttribute('data-total-emissions'));
                 const CO2PerFlight = 2100; // kg de CO2 par vol
