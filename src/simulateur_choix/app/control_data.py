@@ -1,8 +1,8 @@
 def validate_input_data(data: dict) -> str:
     # Vérification de la présence de toutes les clés nécessaires
     expected_keys = [
-        'domicile_lat', 'domicile_lng', 'travail_lat', 'travail_lng','first_name', 'last_name', 'age',
-        'retirement', 'frequency', 'carpooling_days', 'fuel_consumption', 'emission_factor', 
+        'domicile_lat', 'domicile_lng', 'travail_lat', 'travail_lng', 'age',
+        'retirement', 'frequency', 'home_office_days', 'fuel_consumption', 'emission_factor', 
     ]
     for key in expected_keys:
         if key not in data:
@@ -13,12 +13,6 @@ def validate_input_data(data: dict) -> str:
     
     if not data['travail_lat'] or not data['travail_lng'] :
         return "Veuillez entrer un point d'arrivée."
-    
-
-    if not data['first_name']:
-        return "Veuillez entrer votre nom."
-    if not data['last_name']:
-        return "Veuillez entrer votre prénom."
 
     if not data['age']:
         return "Veuillez entrer votre age."
@@ -28,18 +22,18 @@ def validate_input_data(data: dict) -> str:
     # Validation de frequency
     try:
         freq_val = int(data['frequency'])
-        if freq_val < 1 or freq_val > 7:
+        if freq_val < 1 or freq_val > 5:
             raise ValueError
     except ValueError:
-        return "Veuillez entrer un nombre valide pour la fréquence (entre 1 et 7)."
+        return "Veuillez entrer un nombre valide pour la fréquence (entre 1 et 5)."
 
-    # Validation de carpooling_days
+    # Validation de home_office_days
     try:
-        carpooling_days = int(data['carpooling_days'])
-        if carpooling_days < 0 or carpooling_days > 7:
+        home_office_days = int(data['home_office_days'])
+        if home_office_days < 2 or home_office_days > 5:
             raise ValueError
     except ValueError:
-        return "Veuillez entrer un nombre valide pour le nombre de jours en covoiturage (entre 0 et 7)."
+        return "Veuillez entrer un nombre valide pour le nombre de jours en covoiturage (entre 2 et 5)."
 
 
     # Validation de fuel_consumption

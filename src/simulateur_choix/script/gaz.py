@@ -183,15 +183,15 @@ if __name__ == "__main__":
     print(f"Predicted price (linear model) for {date_to_predict}: {predicted_price_linear[0][0]}")
 
 
-    # Generate a list of dates from 2023 to 2060
-    dates_2023_2060 = pd.date_range(start="2023-01-01", end="2060-01-01", freq='M')
+    # Generate a list of dates from 1990 to 2060
+    dates_1990_2060 = pd.date_range(start="1990-01-01", end="2060-01-01", freq='M')
 
     # Predict prices for these dates using both models
-    predicted_prices_linear_2023_2060 = [gaz.predict(date, model_type="linear")[0][0] for date in dates_2023_2060]
+    predicted_prices_linear_2023_2060 = [gaz.predict(date, model_type="linear")[0][0] for date in dates_1990_2060]
 
     # Plotting
     plt.figure(figsize=(14, 7))
-    plt.plot(dates_2023_2060, predicted_prices_linear_2023_2060, label="Linear Model", color="blue")
+    plt.plot(dates_1990_2060, predicted_prices_linear_2023_2060, label="Linear Model", color="blue")
     plt.scatter(gaz.df.month, gaz.df.price, color="red", s=10, label="Actual Prices")
     plt.title("Gas Price Predictions from 2023 to 2060")
     plt.xlabel("Year")
@@ -200,8 +200,5 @@ if __name__ == "__main__":
     plt.grid(True)
     plt.tight_layout()
     plt.show()
-
-    print("end")
-
 
     print("end")

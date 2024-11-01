@@ -1,4 +1,3 @@
-// Supposons que la circonférence de la Terre est d'environ 40,075 km
 document.addEventListener("DOMContentLoaded", function() {
     $(function(){
         $("#form-total").steps({
@@ -158,14 +157,84 @@ document.addEventListener("DOMContentLoaded", function() {
                 
                 // ########## CO2 ##############
                 let totalCO2 = parseFloat(dataContainer.getAttribute('data-total-emissions'));
-                const CO2PerFlight = 2100; // kg de CO2 par vol
-                let numberOfFlights = Math.floor(totalCO2/ CO2PerFlight);
-                // Calculez combien de fois la série entière pourrait être visionnée
-                const CO2PerYearPerPerson = 4360; // kg de CO2 par année par personne
-                let numberOfYears = Math.floor(totalCO2/ CO2PerYearPerPerson);
-                // Mettez à jour le texte pour indiquer combien de fois la série entière pourrait être visionnée
-                d3.select("#CO2-info").text(`Équivaut à ${numberOfFlights} vols Paris-New York!`);
-                // ########## CO2 ##############
+                const CO2perBallon = 4322; // kg de CO2 par vol
+                let numberOfBubbles = Math.floor(totalCO2 / CO2perBallon);
+                d3.select("#CO2-info").text(`Équivaut à ${numberOfBubbles} mongolfières rempli de CO2!`);
+                console.log("Total CO2:", totalCO2);
+                console.log("Number of Bubbles:", numberOfBubbles);
+                // Dimensions and SVG setup
+                const width_bubble = 1000;
+                const height_bubble = 500;
+                var svg_bubble = d3.select("#bubble")
+                    .append("svg")
+                    .attr("width", width_bubble)
+                    .attr("height", height_bubble);
+                function update_bubble(num_bubbles) {
+                    
+                    const radius = 50;
+
+                    // Clear any existing SVG and create a new one
+                    svg_bubble.selectAll("*").remove();
+
+                    const data = d3.range(num_bubbles).map(() => ({
+                        x: Math.random() * width_bubble,
+                        y: Math.random() * height_bubble
+                    }));
+                    
+
+                    // Initialize circles with fixed properties
+                    var node = svg_bubble.append("g")
+                        .selectAll("circle")
+                        .data(data)  // Creates an array [0, 1, 2, ..., num_bubbles-1]
+                        .enter()
+                        .append('circle')
+                        .attr('cx', width_bubble / 2)
+                        .attr('cy', height_bubble / 2)
+                        .attr("r", radius)
+                        .style('fill', '#69b3a2')  // Static color for all bubbles
+                        .style("stroke", "black")
+                        .style("opacity", 1)
+                        .call(d3.drag()
+                            .on("start", dragstarted)
+                            .on("drag", dragged)
+                            .on("end", dragended)
+                        );
+
+                    // Force simulation for non-overlapping bubbles
+                    var simulation = d3.forceSimulation()
+                    .force("center", d3.forceCenter().x(0).y(0)) // Attraction to the center of the svg area
+                    .force("charge", d3.forceManyBody().strength(300)) // Nodes are attracted one each other of value is > 0
+                    .force("collide", d3.forceCollide().strength(0.9).radius(radius).iterations(1)) // Force that avoids circle overlapping
+
+                    simulation
+                        .nodes(data)
+                        .on("tick", function(d){
+                        node
+                        .attr("transform", (d) => "translate(" + d.x + "," + d.y + ")")
+                        });
+
+                    // Dragging functions
+                    function dragstarted(event, d) {
+                        if (!event.active) simulation.alphaTarget(0.03).restart();
+                        d.fx = d.x;
+                        d.fy = d.y;
+                    }
+
+                    function dragged(event, d) {
+                        d.fx = event.x;
+                        d.fy = event.y;
+                    }
+
+                    function dragended(event, d) {
+                        if (!event.active) simulation.alphaTarget(0.03);    
+                        d.fx = null;
+                        d.fy = null;
+                    }
+                }
+
+                // Call the function with the calculated number of bubbles
+                update_bubble(numberOfBubbles);
+
                 }
             },
             onFinished: function (event, currentIndex) {

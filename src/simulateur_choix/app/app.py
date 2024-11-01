@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, flash, url_for
-from simulateur_choix.script.metrics import distance_total, compute_total_time, fuel_cost, co2_emissions, car_cost_annual
+from simulateur_choix.script.metrics import compute_all_metrics
 from simulateur_choix.app.control_data import validate_input_data
 from simulateur_choix.script.route import get_route
 from math import floor
@@ -23,12 +23,10 @@ def index():
         if error:
             flash(error, 'danger')
             return redirect(url_for('index'))
-        first_name = data.get('first_name')
-        last_name = data.get('last_name')
         age = float(data.get('age'))
         retirement = float(data.get('retirement'))
         frequency = float(data.get('frequency'))
-        carpooling_days = int(data.get('carpooling_days'))
+        home_office_days = int(data.get('home_office_days'))
         fuel_consumption = float(data.get('fuel_consumption'))
         emission_factor = float(data.get('emission_factor'))
         time_spent = float(data.get('time_spent'))
@@ -40,15 +38,19 @@ def index():
         distance_daily, time_daily = get_route(domicile_lat,domicile_lng, travail_lat, travail_lng, time_spent)
         # compute metrics:
         remaning_working_years = (retirement-age) if (retirement-age) else 44
-        total_distance = distance_total(distance_daily, frequency, carpooling_days)*remaning_working_years
-        total_fuel_cost = fuel_cost(total_distance, fuel_consumption, remaning_working_years)
-        car_cost = car_cost_annual(remaning_working_years)
-        total_emissions = co2_emissions(total_distance, emission_factor)
-        total_time = compute_total_time(time_daily, remaning_working_years)
-
+        full_time_without_home_office = compute_all_metrics(distance_daily, frequency, 0, remaning_working_years, fuel_consumption, emission_factor, time_daily)
+        full_time_with_home_office = compute_all_metrics(distance_daily, frequency, home_office_days, remaning_working_years, fuel_consumption, emission_factor, time_daily)
+        total_distance = full_time_without_home_office['total_distance'] - full_time_with_home_office['total_distance']
+        time_per_life = full_time_without_home_office['time_per_life'] - full_time_with_home_office['time_per_life']
+        total_cost = full_time_without_home_office['total_cost'] - full_time_with_home_office['total_cost']
+        total_emissions = full_time_without_home_office['total_emissions'] - full_time_with_home_office['total_emissions']
+        days, remainder = divmod(time_per_life, 86400)
+        hours, remainder = divmod(remainder, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        total_time = f"{days} jours, {hours} heures, {minutes} minutes et {seconds} secondes"
         return render_template('results.html', total_distance=total_distance,
-                               total_time=total_time, total_cost=floor(total_fuel_cost+ car_cost),
-                               total_emissions=floor(total_emissions), first_name=first_name, last_name=last_name)
+                               total_time=total_time, total_cost=floor(total_cost),
+                               total_emissions=total_emissions)
     else:
         return render_template('index.html')
 

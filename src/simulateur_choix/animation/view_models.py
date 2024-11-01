@@ -9,8 +9,6 @@ class PlotDataAndPredictions(Scene):
         self.gaz = Gaz()
         self.gaz.extract().transform()
         self.gaz.train_linear_model()
-        self.gaz.train_medium_model()
-        self.gaz.train_random_forest()
 
         # Convert datetime64[ns] to number of days since the first date
         days_since_start = (self.gaz.df.month - self.gaz.df.month.min()) / np.timedelta64(1, 'D')
@@ -54,7 +52,6 @@ class PlotDataAndPredictions(Scene):
         self.play(Create(interpolated_line_linear), run_time=4)
         self.wait(2)
 
-        # Ajouter les valeurs sur l'axe des y et les intersections
         
 
         # SECOND PART
