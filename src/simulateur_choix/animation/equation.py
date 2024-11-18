@@ -1,7 +1,7 @@
 from manim import * 
 import numpy as np
 import random
-class MovingFrame(Scene):
+class EquationIllustration(Scene):
      def construct(self):
         # first equation
         equation = MathTex("2x", "-2", "", )

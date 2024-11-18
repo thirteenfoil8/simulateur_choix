@@ -9,3 +9,4 @@ scikit-learn
 matplotlib
 statsmodels
 keras
+setuptools

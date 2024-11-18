@@ -10,6 +10,8 @@
 	<!-- Font-->
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/opensans-font.css') }}">
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='fonts/material-design-iconic-font/css/material-design-iconic-font.min.css') }}">
+	<!-- datepicker -->
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery-ui.min.css') }}">
 	<!-- Main Style Css -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
 	<!-- D3 js -->
@@ -17,9 +19,7 @@
 	<script src="https://d3js.org/d3-geo.v2.min.js"></script>
 	<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
   	<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
-	<script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+	
 	{% endblock %}
 </head>
 
@@ -31,7 +31,10 @@
     </div>
 
 
-
+	<script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/jquery.steps.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/jquery-ui.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 
 </html>
